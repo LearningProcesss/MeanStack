@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+  <span><a [routerLink]="[ '/']">Posterize</a></span>
+  <ul>
+    <li *ngIf="autenticato">
+      <a mat-button [routerLink]="[ '/create' ]" routerLinkActive="mat-accent">Crea</a>
+    </li>
+    <li *ngIf="!autenticato">
+      <a mat-button [routerLink]="[ '/login' ]" routerLinkActive="mat-accent">Login</a>
+    </li>
+    <li *ngIf="!autenticato">
+      <a mat-button [routerLink]="[ '/signup' ]" routerLinkActive="mat-accent">Signup</a>
+    </li>
+    <li>
+      <button *ngIf="autenticato" mat-button (click)="onLogout()">Logout</button>
+    </li>
+  </ul>
+</mat-toolbar>

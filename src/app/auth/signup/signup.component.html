@@ -1,0 +1,12 @@
+<mat-card>
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <form (submit)="onSignupClick(signupForm)" #signupForm="ngForm">
+    <mat-form-field>
+      <input matInput name="email" ngModel #emailField="ngModel" placeholder="email" required email>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="password" ngModel #passwordField="ngModel" name="password">
+    </mat-form-field>
+    <button mat-raised-button color="accent" type="submit">Signup</button>
+  </form>
+</mat-card>
