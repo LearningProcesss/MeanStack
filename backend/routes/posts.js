@@ -31,7 +31,7 @@ const serverStorage = multer.diskStorage({
     }
 });
 
-router.get("", (req, resp) => {
+router.get("", async (req, resp) => {
 
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.page;
@@ -41,23 +41,30 @@ router.get("", (req, resp) => {
         postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
     }
 
-    // var viewModel = {
-    //     message: "",
-    //     posts: []
-    // };
+    try {
+        var pageResult = new PagedResult(currentPage, pageSize);
 
-    var pageResult = new PagedResult(currentPage, pageSize);
+        pageResult.resultsArray = await postQuery;
 
-    postQuery.then(result => {
-        //viewModel.posts = result;
-        pageResult.resultsArray = result;
-        return Post.count();
-    }).then((count) => {
-
-        pageResult.count = count;
+        pageResult.count = await Post.count();
 
         resp.status(200).json({ pagedResult: pageResult });
-    });
+    } catch (error) {
+        resp.status(500).json({ messaggioErrore: "Errore lettura Posts!" });
+    }
+
+
+    //.then(result => {
+
+    //viewModel.posts = result;
+    //     pageResult.resultsArray = result;
+    //     return Post.count();
+    // }).then((count) => {
+
+    //     pageResult.count = count;
+
+    //     resp.status(200).json({ pagedResult: pageResult });
+    // });
 });
 
 router.get("/:id", (req, resp) => {
@@ -74,7 +81,7 @@ router.get("/:id", (req, resp) => {
 
 });
 
-router.post("", middleWareUser, multer({ storage: serverStorage }).single("image"), (req, resp) => {
+router.post("", middleWareUser, multer({ storage: serverStorage }).single("image"), async (req, resp) => {
 
     const url = req.protocol + '://' + req.get('host');
 
@@ -85,15 +92,21 @@ router.post("", middleWareUser, multer({ storage: serverStorage }).single("image
 
     const post = new Post(obj);
 
-    post.save()
-        .then(result => {
-            resp.status(200).send({ id: result._id, title: result.title, content: result.content, imagePath: result.imagePath });
-        })
-        .catch(error => {
-            console.log(error);
-        });
+    try {
+        var result = await post.save();
 
-    resp.status(201);
+        resp.status(200).send({ id: result._id, title: result.title, content: result.content, imagePath: result.imagePath });
+    } catch (error) {
+        resp.status(500).json({ messaggioErrore: "Errore salvataggio Post!" });
+    }
+    // post.save()
+    //     .then(result => {
+    //         resp.status(200).send({ id: result._id, title: result.title, content: result.content, imagePath: result.imagePath });
+    //     })
+    //     .catch(error => {
+    //         console.log(error);
+    //     });
+
 });
 
 router.put('/:id', middleWareUser, multer({ storage: serverStorage }).single("image"), async (req, resp) => {
@@ -106,31 +119,30 @@ router.put('/:id', middleWareUser, multer({ storage: serverStorage }).single("im
     }
 
     if (!ObjectID.isValid(req.params.id)) {
-        return resp.status(404).send();
+        return resp.status(404).json({ messaggioErrore: "Id non valido." });
     }
 
     var obj = _.pick(req.body, ["title", "content"]);
 
     try {
+
         const postAggiornato = await Post.findOneAndUpdate({ _id: req.params.id, creator: req.utenteloggato.id }, obj);
 
-        console.log(postAggiornato);
-
         if (typeof postAggiornato != 'undefined' && postAggiornato) {
-            resp.status(200).send(postAggiornato);
+            resp.status(200).json(postAggiornato);
         }
         else {
-            resp.status(401);
+            resp.status(401).json({ messaggioErrore: "Post non trovato." });
         }
     } catch (error) {
-        resp.status(400).send();
+        resp.status(500).json({ messaggioErrore: "Errore interno." });
     }
 });
 
 router.delete("/:id", middleWareUser, async (req, resp) => {
 
     if (!ObjectID.isValid(req.params.id)) {
-        return resp.status(404).send();
+        return resp.status(404).json({ messaggioErrore: "Id non valido." })
     }
 
     try {
@@ -139,13 +151,13 @@ router.delete("/:id", middleWareUser, async (req, resp) => {
         //const postEliminato = await Post.findByIdAndRemove(req.params.id);
 
         if (typeof postAggiornato != 'undefined' && postAggiornato) {
-            resp.status(200).send(postEliminato);
+            resp.status(200).json(postEliminato);
         }
         else {
-            resp.status(401);
+            resp.status(401).json({ messaggioErrore: "Post non trovato." })
         }
     } catch (error) {
-        resp.status(400).send();
+        resp.status(500).json({ messaggioErrore: "Errore interno." });
     }
 
 

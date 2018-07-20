@@ -8,15 +8,10 @@ const router = express.Router();
 
 router.post("/login", async (req, resp) => {
 
-    console.log(req.body);
-
-
-    var usr = await User.findOne({ email: req.body.email });
-
-    console.log(usr);
+    const usr = await User.findOne({ email: req.body.email });
 
     if (!usr) {
-        return resp.status(404).send();
+        return resp.status(404).json({ messaggioErrore: "Email errata o utente non trovato." });
     }
 
     try {
@@ -24,7 +19,7 @@ router.post("/login", async (req, resp) => {
         var ret = await usr.compara(req.body.password);
 
         if (!ret) {
-            return resp.status(404).send();
+            return resp.status(404).json({ messaggioErrore: "Password errata." });
         }
 
         var tok = usr.creaToken();
@@ -32,28 +27,39 @@ router.post("/login", async (req, resp) => {
         resp.status(200).json({ token: tok, expire: 3600 * 1000, uId: usr._id });
 
     } catch (error) {
-        console.log(error);
+         resp.status(500).json({ messaggioErrore: "Errore autenticazione." });
     }
 });
 
-router.post("/signup", (req, resp) => {
+router.post("/signup", async (req, resp) => {
 
     var userBody = _.pick(req.body, ["email", "password"]);
 
     const user = new User(userBody);
 
-    user.save().then((result) => {
-        resp.status(201).json({
-            message: "User created",
-            result: result
-        });
-    }).catch((err) => {
-        console.log(err);
+    try {
 
-        resp.status(500).json({
-            error: err
-        });
-    });
+        const userUpdated = await user.save();
+
+        resp.status(201).json({ messagioOk: "Creato.", email: userUpdated.email });
+
+    } catch (error) {
+        resp.status(500).json({ messaggioErrore: "Errore autenticazione." });
+    }
+    
+
+    // user.save().then((result) => {
+    //     resp.status(201).json({
+    //         message: "User created",
+    //         result: result
+    //     });
+    // }).catch((err) => {
+    //     console.log(err);
+
+    //     resp.status(500).json({
+    //         error: err
+    //     });
+    // });
 });
 
 module.exports = router;

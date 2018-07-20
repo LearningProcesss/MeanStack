@@ -58,6 +58,7 @@ export class AuthCache {
     public deleteLocal() {
         localStorage.removeItem("token");
         localStorage.removeItem("expire");
+        localStorage.removeItem("uid");
     }
 
     public isValidToken(): boolean {
