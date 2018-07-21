@@ -14,8 +14,6 @@ module.exports = async (req, resp, next) => {
 
         req.utenteloggato = { email: utente.email, id: utente._id };
 
-        console.log(req.utenteloggato);
-
         next();
         
     } catch (error) {
