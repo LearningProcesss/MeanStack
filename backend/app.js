@@ -19,7 +19,7 @@ mongoose
   .catch(() => {
     console.log("Connessione mongo atlas non riuscita.");
   });
-app.use("/images", express.static(path.join("backend/images")));
+app.use("/images", express.static(path.join("images")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, resp, next) => {
