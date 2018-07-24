@@ -4,7 +4,7 @@ import { AuthData, AuthCache } from './auth-data';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
-
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,7 @@ export class AuthService {
       email: email, password: password
     }
 
-    this.http.post("http://localhost:3000/api/users/signup", authData).subscribe(response => {
+    this.http.post(environment.api + "/users/signup", authData).subscribe(response => {
       this.router.navigate(['/login']);
     });
   }
@@ -54,7 +54,7 @@ export class AuthService {
       email: email, password: password
     }
 
-    this.http.post<{ token: string, expire: number, uId: string }>("http://localhost:3000/api/users/login", authData).subscribe(response => {
+    this.http.post<{ token: string, expire: number, uId: string }>(environment.api + "/users/login", authData).subscribe(response => {
 
       if (response.token) {
 

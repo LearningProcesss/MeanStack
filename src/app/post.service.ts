@@ -3,6 +3,8 @@ import { HttpClient } from "@angular/common/http";
 import { Subject } from "rxjs";
 import { map } from "rxjs/operators";
 
+import { environment } from "../environments/environment";
+
 import { Post } from "./post";
 import { Router } from "@angular/router";
 import { PagedResult } from "./pagedResult";
@@ -26,7 +28,7 @@ export class PostService {
     postData.append("image", image, title);
 
     this.http
-      .post("http://localhost:3000/api/posts", postData)
+      .post(environment.api + "/posts", postData)
       .subscribe((response: Post) => {
         this.router.navigate(["/"]);
       });
@@ -61,14 +63,14 @@ export class PostService {
     console.log(postDataForm);
     
 
-    this.http.put('http://localhost:3000/api/posts/' + id, postDataForm)
+    this.http.put(environment.api + '/posts/' + id, postDataForm)
       .subscribe((response: Post) => {
         this.router.navigate(["/"]);
       });
   }
 
   getPost(id: string) {
-    return this.http.get("http://localhost:3000/api/posts/" + id);
+    return this.http.get(environment.api + "/posts/" + id);
   }
 
   getPosts(pageSize: number, currentPage: number) {
@@ -76,7 +78,7 @@ export class PostService {
     const queryParams = `?pagesize=${pageSize}&page=${currentPage}`;
 
     this.http
-      .get<{ pagedResult: PagedResult<Post> }>("http://localhost:3000/api/posts" + queryParams)
+      .get<{ pagedResult: PagedResult<Post> }>(environment.api + "/posts" + queryParams)
       .pipe(
         map(responseData => {
 
@@ -107,6 +109,6 @@ export class PostService {
   }
 
   deletePost(id: string) {
-    return this.http.delete("http://localhost:3000/api/posts/" + id);
+    return this.http.delete(environment.api + "/posts/" + id);
   }
 }

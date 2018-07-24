@@ -11,7 +11,7 @@ const app = express();
 
 mongoose
   .connect(
-    "mongodb+srv://anw:VcSVZieTtxmVRued@cluster0-qmyid.mongodb.net/mean-stack"
+    "mongodb+srv://"+ process.env.MONGO_ATLAS_USR + ":" + process.env.MONGO_ATLAS_PW +"@cluster0-qmyid.mongodb.net/mean-stack"
   )
   .then(result => {
     console.log("Connessione mongo atlas riuscita.");

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const schema = mongoose.Schema({
@@ -35,7 +35,7 @@ schema.methods.creaToken = function () {
 
     var token = jwt.sign({
         email: utente.email, id: utente._id
-    }, "!2M@34n*T(", { expiresIn: "1h" });
+    }, process.env.KEY, { expiresIn: "1h" });
 
     return token;
 }
@@ -46,7 +46,7 @@ schema.statics.trovaByToken = async function (tokenFrom) {
     var decoded;
 
     try {
-        decoded = jwt.verify(tokenFrom, "!2M@34n*T(");
+        decoded = jwt.verify(tokenFrom, process.env.KEY);
     } catch (error) {
 
     }
